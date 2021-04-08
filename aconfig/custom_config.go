@@ -9,16 +9,21 @@ const (
 	defaultConnectionMaxLifeSeconds  = 3600 // an hour
 	defaultConnectionMaxIdleSeconds  = 300  // 5 minutes
 	defaultSlowThresholdMilliseconds = 500  // 0.5 second
+
+	defaultPropertyPrefix = "ENC("
+	defaultPropertySuffix = ")"
 )
 
 type Common struct {
-	Log      Log      `json:"log,omitempty"`
-	Database Database `json:"database,omitempty"`
+	Log       Log       `json:"log,omitempty"`
+	Database  Database  `json:"database,omitempty"`
+	Encryptor Encryptor `json:"encryptor,omitempty"`
 }
 
 func (c *Common) Complete() {
 	c.Log.complete()
 	c.Database.complete()
+	c.Encryptor.complete()
 }
 
 type Log struct {
@@ -58,5 +63,20 @@ func (db *Database) complete() {
 	}
 	if db.SlowThresholdMilliseconds == 0 {
 		db.SlowThresholdMilliseconds = defaultSlowThresholdMilliseconds
+	}
+}
+
+type Encryptor struct {
+	Password       string `json:"password,omitempty"`
+	PropertyPrefix string `json:"property_prefix,omitempty"`
+	PropertySuffix string `json:"property_suffix,omitempty"`
+}
+
+func (ec *Encryptor) complete() {
+	if ec.PropertyPrefix == "" {
+		ec.PropertyPrefix = defaultPropertyPrefix
+	}
+	if ec.PropertySuffix == "" {
+		ec.PropertySuffix = defaultPropertySuffix
 	}
 }

@@ -2,7 +2,10 @@ package aconfig
 
 import (
 	"encoding/json"
+	"fmt"
+	"github.com/alphaframework/alpha/autil/acrypto/pbe"
 	"io/ioutil"
+	"regexp"
 	"time"
 
 	"github.com/ghodss/yaml"
@@ -58,11 +61,19 @@ type Application struct {
 	Spec       ApplicationSpec `json:"spec,omitempty"`
 }
 
-func New(configFile string) (*Application, error) {
+type PreProcessFunc func([]byte) ([]byte, error)
+
+func New(configFile string, options ...PreProcessFunc) (*Application, error) {
 	var application = &Application{}
 	data, err := ioutil.ReadFile(configFile)
 	if err != nil {
 		return nil, err
+	}
+	// Run the options on it
+	for _, option := range options {
+		if data, err = option(data); err != nil {
+			return nil, err
+		}
 	}
 	err = yaml.Unmarshal(data, application)
 	if err != nil {
@@ -70,6 +81,35 @@ func New(configFile string) (*Application, error) {
 	}
 
 	return application, nil
+}
+
+func PBEWithMD5AndDES_Decrypt(encryptor Encryptor) PreProcessFunc {
+	return func(data []byte) ([]byte, error) {
+		encryptor.complete()
+		expr := fmt.Sprintf(`%s(.*)%s`,
+			regexp.QuoteMeta(encryptor.PropertyPrefix),
+			regexp.QuoteMeta(encryptor.PropertySuffix))
+		re, err := regexp.Compile(expr)
+		if err != nil {
+			return nil, err
+		}
+		ret := re.ReplaceAllFunc(data, _PBEWithMD5AndDES_Decrypt(encryptor.Password, re))
+		return ret, nil
+	}
+}
+
+func _PBEWithMD5AndDES_Decrypt(password string, re *regexp.Regexp) func([]byte) []byte {
+	return func(s []byte) []byte {
+		ret := re.FindStringSubmatch(string(s))
+		if ret != nil && len(ret) > 1 {
+			decrypt, err := pbe.PBEWithMD5AndDES_Decrypt(ret[1], password)
+			if err != nil {
+				panic(err)
+			}
+			return []byte(decrypt)
+		}
+		return s
+	}
 }
 
 func (a *Application) GetName() string {
