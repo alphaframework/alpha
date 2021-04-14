@@ -18,6 +18,15 @@ func valueOf(i interface{}) reflect.Value {
 	return reflect.ValueOf(i)
 }
 
+func In(target string, strArray []string) bool {
+	for _, element := range strArray {
+		if target == element {
+			return true
+		}
+	}
+	return false
+}
+
 func GetPointer(v interface{}) interface{} {
 	vv := valueOf(v)
 	if vv.Kind() == reflect.Ptr {

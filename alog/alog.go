@@ -3,7 +3,7 @@ package alog
 import (
 	"context"
 	"fmt"
-
+	"github.com/alphaframework/alpha/autil"
 	"github.com/alphaframework/alpha/autil/ahttp/request"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -13,7 +13,7 @@ import (
 const (
 	defaultLogRootDir = "/data/log"
 	defaultLogLevel   = "info"
-	defaultLogFormat  = "json"
+	defaultLogFormat  = "console"
 
 	RequestIdKey = "request_id"
 )
@@ -27,9 +27,14 @@ var (
 // applicationName
 // rootDirectory: log root directory
 // level: log level (debug/info/warn/error/panic/fatal)
+// format: log format (console/json)
 func InitLogger(applicationName, rootDirectory, level, format string) error {
 	if applicationName == "" {
 		return fmt.Errorf("applicationName is required")
+	}
+	formatList := []string{"", "console", "json"}
+	if !autil.In(format, formatList) {
+		return fmt.Errorf("log format: %s does not validate as in %#v", format, formatList)
 	}
 
 	if rootDirectory == "" {
@@ -60,8 +65,8 @@ func InitLogger(applicationName, rootDirectory, level, format string) error {
 		CallerKey:      "caller",
 		StacktraceKey:  "stacktrace",
 		LineEnding:     zapcore.DefaultLineEnding,
-		EncodeLevel:    zapcore.LowercaseLevelEncoder,
-		EncodeTime:     zapcore.ISO8601TimeEncoder,
+		EncodeLevel:    zapcore.CapitalLevelEncoder,
+		EncodeTime:     zapcore.TimeEncoderOfLayout("2006-01-02 15:04:05.000"),
 		EncodeDuration: zapcore.SecondsDurationEncoder,
 		EncodeCaller:   zapcore.ShortCallerEncoder,
 		EncodeName:     zapcore.FullNameEncoder,
@@ -74,12 +79,11 @@ func InitLogger(applicationName, rootDirectory, level, format string) error {
 	atomicLevel := zap.NewAtomicLevel()
 	atomicLevel.SetLevel(l)
 	var writes = []zapcore.WriteSyncer{zapcore.AddSync(&output)}
-	encoder := zapcore.NewJSONEncoder(encoderConfig)
-	if format == "console" {
-		encoderConfig.EncodeTime = zapcore.TimeEncoderOfLayout("2006-01-02 15:04:05.000")
-		encoderConfig.EncodeLevel = zapcore.CapitalLevelEncoder
-		encoder = zapcore.NewConsoleEncoder(encoderConfig)
-		zapcore.NewMapObjectEncoder()
+	encoder := zapcore.NewConsoleEncoder(encoderConfig)
+	if format == "json" {
+		encoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
+		encoderConfig.EncodeLevel = zapcore.LowercaseLevelEncoder
+		encoder = zapcore.NewJSONEncoder(encoderConfig)
 	}
 	core := zapcore.NewCore(
 		encoder,
