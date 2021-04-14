@@ -4,15 +4,16 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/alphaframework/alpha/autil/ahttp/request"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
-	"github.com/alphaframework/alpha/autil/ahttp/request"
 )
 
 const (
 	defaultLogRootDir = "/data/log"
 	defaultLogLevel   = "info"
+	defaultLogFormat  = "json"
 
 	RequestIdKey = "request_id"
 )
@@ -26,7 +27,7 @@ var (
 // applicationName
 // rootDirectory: log root directory
 // level: log level (debug/info/warn/error/panic/fatal)
-func InitLogger(applicationName, rootDirectory, level string) error {
+func InitLogger(applicationName, rootDirectory, level, format string) error {
 	if applicationName == "" {
 		return fmt.Errorf("applicationName is required")
 	}
@@ -39,6 +40,9 @@ func InitLogger(applicationName, rootDirectory, level string) error {
 
 	if level == "" {
 		level = defaultLogLevel
+	}
+	if format == "" {
+		format = defaultLogFormat
 	}
 
 	output := lumberjack.Logger{
@@ -70,8 +74,15 @@ func InitLogger(applicationName, rootDirectory, level string) error {
 	atomicLevel := zap.NewAtomicLevel()
 	atomicLevel.SetLevel(l)
 	var writes = []zapcore.WriteSyncer{zapcore.AddSync(&output)}
+	encoder := zapcore.NewJSONEncoder(encoderConfig)
+	if format == "console" {
+		encoderConfig.EncodeTime = zapcore.TimeEncoderOfLayout("2006-01-02 15:04:05.000")
+		encoderConfig.EncodeLevel = zapcore.CapitalLevelEncoder
+		encoder = zapcore.NewConsoleEncoder(encoderConfig)
+		zapcore.NewMapObjectEncoder()
+	}
 	core := zapcore.NewCore(
-		zapcore.NewJSONEncoder(encoderConfig),
+		encoder,
 		zapcore.NewMultiWriteSyncer(writes...),
 		atomicLevel,
 	)

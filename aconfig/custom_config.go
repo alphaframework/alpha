@@ -25,6 +25,7 @@ func (c *Common) Complete() {
 type Log struct {
 	Level     string `json:"level,omitempty"`
 	Directory string `json:"directory,omitempty"`
+	Format    string `json:"format,omitempty"`
 }
 
 func (l *Log) complete() {
