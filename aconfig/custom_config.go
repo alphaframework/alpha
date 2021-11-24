@@ -4,6 +4,9 @@ const (
 	defaultLogLevel     = "info"
 	defaultLogDirectory = "/data/log"
 
+	defaultTmpDirectory     = "/data/tmp"
+	defaultPrivateDirectory = "/data/private"
+
 	defaultMaxOpenConnections        = 100
 	defaultMaxIdleConnections        = 5
 	defaultConnectionMaxLifeSeconds  = 3600 // an hour
@@ -15,11 +18,27 @@ type Common struct {
 	Log       Log       `json:"log,omitempty"`
 	Database  Database  `json:"database,omitempty"`
 	Encryptor Encryptor `json:"encryptor,omitempty"`
+	Var       Var       `json:"var,omitempty"`
 }
 
 func (c *Common) Complete() {
 	c.Log.complete()
 	c.Database.complete()
+	c.Var.complete()
+}
+
+type Var struct {
+	TmpDirectory     string `json:"tmp_directory,omitempty"`
+	PrivateDirectory string `json:"private_directory,omitempty"`
+}
+
+func (v *Var) complete() {
+	if v.TmpDirectory == "" {
+		v.TmpDirectory = defaultTmpDirectory
+	}
+	if v.PrivateDirectory == "" {
+		v.PrivateDirectory = defaultPrivateDirectory
+	}
 }
 
 type Log struct {
