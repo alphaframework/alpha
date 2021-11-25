@@ -1,5 +1,7 @@
 package aconfig
 
+import "strings"
+
 const (
 	defaultLogLevel     = "info"
 	defaultLogDirectory = "/data/log"
@@ -21,10 +23,10 @@ type Common struct {
 	Var       Var       `json:"var,omitempty"`
 }
 
-func (c *Common) Complete() {
-	c.Log.complete()
+func (c *Common) Complete(applicationName string) {
+	c.Log.complete(applicationName)
 	c.Database.complete()
-	c.Var.complete()
+	c.Var.complete(applicationName)
 }
 
 type Var struct {
@@ -32,13 +34,23 @@ type Var struct {
 	PrivateDirectory string `json:"private_directory,omitempty"`
 }
 
-func (v *Var) complete() {
+func (v *Var) complete(applicationName string) {
 	if v.TmpDirectory == "" {
 		v.TmpDirectory = defaultTmpDirectory
 	}
 	if v.PrivateDirectory == "" {
 		v.PrivateDirectory = defaultPrivateDirectory
 	}
+	v.TmpDirectory = joinPath(v.TmpDirectory, applicationName)
+	v.PrivateDirectory = joinPath(v.PrivateDirectory, applicationName)
+}
+
+func (v *Var) GetTmpDirectory() string {
+	return v.TmpDirectory
+}
+
+func (v *Var) GetPrivateDirectory() string {
+	return v.PrivateDirectory
 }
 
 type Log struct {
@@ -47,13 +59,18 @@ type Log struct {
 	Format    string `json:"format,omitempty"`
 }
 
-func (l *Log) complete() {
+func (l *Log) complete(applicationName string) {
 	if l.Level == "" {
 		l.Level = defaultLogLevel
 	}
 	if l.Directory == "" {
 		l.Directory = defaultLogDirectory
 	}
+	l.Directory = joinPath(l.Directory, applicationName)
+}
+
+func joinPath(path1, path2 string) string {
+	return strings.TrimRight(path1, "/") + "/" + path2
 }
 
 type Database struct {
