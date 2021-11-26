@@ -3,6 +3,7 @@ package alog
 import (
 	"context"
 	"fmt"
+
 	"github.com/alphaframework/alpha/autil"
 	"github.com/alphaframework/alpha/autil/ahttp/request"
 	"go.uber.org/zap"
@@ -11,9 +12,8 @@ import (
 )
 
 const (
-	defaultLogRootDir = "/data/log"
-	defaultLogLevel   = "info"
-	defaultLogFormat  = "console"
+	defaultLogLevel  = "info"
+	defaultLogFormat = "console"
 
 	RequestIdKey = "request_id"
 )
@@ -25,10 +25,10 @@ var (
 
 // InitLogger init Logger and Sugar
 // applicationName
-// rootDirectory: log root directory
+// directory: log directory
 // level: log level (debug/info/warn/error/panic/fatal)
 // format: log format (console/json)
-func InitLogger(applicationName, rootDirectory, level, format string) error {
+func InitLogger(applicationName, directory, level, format string) error {
 	if applicationName == "" {
 		return fmt.Errorf("applicationName is required")
 	}
@@ -37,10 +37,9 @@ func InitLogger(applicationName, rootDirectory, level, format string) error {
 		return fmt.Errorf("log format: %s does not validate as in %#v", format, formatList)
 	}
 
-	if rootDirectory == "" {
-		rootDirectory = defaultLogRootDir
+	if directory == "" {
+		return fmt.Errorf("directory is required")
 	}
-	directory := rootDirectory + "/" + applicationName
 	logPath := directory + "/" + applicationName + ".log"
 
 	if level == "" {
