@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"time"
 
-	"gorm.io/driver/mysql"
-	"gorm.io/gorm"
-	gormlogger "gorm.io/gorm/logger"
 	"github.com/alphaframework/alpha/aconfig"
 	"github.com/alphaframework/alpha/alog"
 	"github.com/alphaframework/alpha/alog/gormwrapper"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
+	gormlogger "gorm.io/gorm/logger"
 )
 
 func MustNewDBWith(portName aconfig.PortName, appConfig *aconfig.Application, driver string, commonConfig *aconfig.Database) *gorm.DB {

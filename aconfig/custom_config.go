@@ -1,6 +1,8 @@
 package aconfig
 
-import "strings"
+import (
+	"strings"
+)
 
 const (
 	defaultLogLevel     = "info"
@@ -17,16 +19,18 @@ const (
 )
 
 type Common struct {
-	Log       Log       `json:"log,omitempty"`
-	Database  Database  `json:"database,omitempty"`
-	Encryptor Encryptor `json:"encryptor,omitempty"`
-	Var       Var       `json:"var,omitempty"`
+	Log          Log          `json:"log,omitempty"`
+	Database     Database     `json:"database,omitempty"`
+	Encryptor    Encryptor    `json:"encryptor,omitempty"`
+	Var          Var          `json:"var,omitempty"`
+	SaramaConfig SaramaConfig `json:"sarama_config,omitempty"`
 }
 
 func (c *Common) Complete(applicationName string) {
 	c.Log.complete(applicationName)
 	c.Database.complete()
 	c.Var.complete(applicationName)
+	c.SaramaConfig.complete()
 }
 
 type Var struct {
