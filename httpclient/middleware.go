@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"runtime/debug"
 
-	"github.com/alphaframework/alpha/alog"
-	"github.com/alphaframework/alpha/autil"
-	"github.com/alphaframework/alpha/autil/ahttp"
+	"github.com/dartagnanli/alpha/alog"
+	"github.com/dartagnanli/alpha/autil"
+	"github.com/dartagnanli/alpha/autil/ahttp"
 	"github.com/go-resty/resty/v2"
 	"go.uber.org/zap"
 )

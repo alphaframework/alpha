@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/alphaframework/alpha/autil"
-	"github.com/alphaframework/alpha/autil/ahttp/request"
+	"github.com/dartagnanli/alpha/autil"
+	"github.com/dartagnanli/alpha/autil/ahttp/request"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"

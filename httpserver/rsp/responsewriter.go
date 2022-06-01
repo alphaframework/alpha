@@ -1,8 +1,8 @@
 package rsp
 
 import (
+	"github.com/dartagnanli/alpha/aerror"
 	"github.com/gin-gonic/gin"
-	"github.com/alphaframework/alpha/aerror"
 )
 
 func Error(c *gin.Context, err error) {

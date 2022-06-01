@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/alphaframework/alpha/aconfig"
-	"github.com/alphaframework/alpha/alog"
-	"github.com/alphaframework/alpha/alog/gormwrapper"
+	"github.com/dartagnanli/alpha/aconfig"
+	"github.com/dartagnanli/alpha/alog"
+	"github.com/dartagnanli/alpha/alog/gormwrapper"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	gormlogger "gorm.io/gorm/logger"

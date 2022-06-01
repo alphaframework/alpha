@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/Shopify/sarama"
-	"github.com/alphaframework/alpha/aconfig"
-	"github.com/alphaframework/alpha/alog"
+	"github.com/dartagnanli/alpha/aconfig"
+	"github.com/dartagnanli/alpha/alog"
 )
 
 func MustKafkaConfigWith(portName aconfig.PortName, appConfig *aconfig.Application, saramaConfig *aconfig.SaramaConfig) (*sarama.Config, []string, string) {
