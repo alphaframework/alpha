@@ -1,11 +1,17 @@
 package aconfig
 
 import (
+	"context"
 	"crypto/tls"
 	"crypto/x509"
 	"os"
 
 	"github.com/Shopify/sarama"
+	"github.com/dartagnanli/alpha/alog"
+	"k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
 )
 
 // type RequiredAcks int16
@@ -40,6 +46,8 @@ type SaramaConfig struct {
 	CertFile           string      `json:"cert_file,omitempty"`
 	KeyFile            string      `json:"key_file,omitempty"`
 	CaFile             string      `json:"ca_file,omitempty"`
+	K8sNamespace       string      `json:"k8s_namespace,omitempty"`
+	K8sSecret          string      `json:"k8s_secret,omitempty"`
 }
 
 func (sc *SaramaConfig) complete() {
@@ -63,7 +71,7 @@ func (sc *SaramaConfig) complete() {
 		sc.InsecureSkipVerify = true
 	}
 	if sc.NetTLSEnable {
-		tlsConfig := sc.createTLSConfiguration()
+		tlsConfig := sc.createTLSConfigurationWithK8s()
 		if tlsConfig != nil {
 			sc.NetTLSConfig = tlsConfig
 		}
@@ -98,5 +106,40 @@ func (sc *SaramaConfig) createTLSConfiguration() (t *tls.Config) {
 		}
 	}
 	// will be nil by default if nothing is provided
+	return t
+}
+
+func (sc *SaramaConfig) createTLSConfigurationWithK8s() (t *tls.Config) {
+
+	cfg, err := rest.InClusterConfig()
+	if err != nil {
+		panic(err.Error())
+	}
+	clientset, err := kubernetes.NewForConfig(cfg)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	secret := sc.K8sSecret
+	namespace := sc.K8sNamespace
+	mySecret, err := clientset.CoreV1().Secrets(namespace).Get(context.TODO(), secret, metav1.GetOptions{})
+	if err != nil {
+		if errors.IsNotFound(err) {
+			alog.Sugar.Errorf("Secret %s in namespace %s not found\n", secret, namespace)
+		}
+	}
+	cert, err := tls.X509KeyPair(mySecret.Data["cert.pem"], mySecret.Data["key.pem"])
+	if err != nil {
+		panic(err.Error())
+	}
+	caCertPool := x509.NewCertPool()
+	caCertPool.AppendCertsFromPEM(mySecret.Data["ca_cert.pem"])
+
+	t = &tls.Config{
+		Certificates:       []tls.Certificate{cert},
+		RootCAs:            caCertPool,
+		InsecureSkipVerify: sc.InsecureSkipVerify,
+	}
+
 	return t
 }
