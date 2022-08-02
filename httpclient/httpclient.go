@@ -5,8 +5,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/alphaframework/alpha/aconfig"
-	"github.com/alphaframework/alpha/alog"
+	"github.com/dartagnanli/alpha/aconfig"
+	"github.com/dartagnanli/alpha/alog"
 	"github.com/go-resty/resty/v2"
 	"go.uber.org/zap"
 )

@@ -3,7 +3,7 @@ package ginwrapper
 import (
 	"time"
 
-	"github.com/alphaframework/alpha/alog"
+	"github.com/dartagnanli/alpha/alog"
 	"github.com/gin-gonic/gin"
 )
 
