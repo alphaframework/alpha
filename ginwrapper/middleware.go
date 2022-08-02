@@ -10,13 +10,14 @@ import (
 	"strings"
 	"time"
 
+	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
+
 	"github.com/alphaframework/alpha/aerror"
 	"github.com/alphaframework/alpha/alog"
 	"github.com/alphaframework/alpha/autil"
 	"github.com/alphaframework/alpha/autil/ahttp"
 	"github.com/alphaframework/alpha/autil/ahttp/request"
-	"github.com/gin-gonic/gin"
-	"go.uber.org/zap"
 )
 
 const (
@@ -153,7 +154,8 @@ func RecoveryWithZap(logger *zap.Logger, stack bool) gin.HandlerFunc {
 				}
 
 				if stack {
-					logger.Error("[Recovery from panic]",
+					// logger.Error("[Recovery from panic]",
+					logger.Error("[Recovery from panic]"+string(debug.Stack()),
 						zap.Time("time", time.Now()),
 						zap.Any("error", err),
 						zap.String("request", string(httpRequest)),
