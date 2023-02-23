@@ -2,7 +2,7 @@ package aconfig
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"os"
 	"time"
 
 	"github.com/ghodss/yaml"
@@ -62,7 +62,7 @@ type PreProcessFunc func([]byte) ([]byte, error)
 
 func New(configFile string, funcs ...PreProcessFunc) (*Application, error) {
 	var application = &Application{}
-	data, err := ioutil.ReadFile(configFile)
+	data, err := os.ReadFile(configFile)
 	if err != nil {
 		return nil, err
 	}

@@ -2,7 +2,7 @@ package httpclient
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"runtime/debug"
 
@@ -23,7 +23,7 @@ func formatRequestBodyString(req *http.Request, maxBodySize int) (string, error)
 	if err != nil || bodyReader == nil {
 		return "", err
 	}
-	body, err := ioutil.ReadAll(bodyReader)
+	body, err := io.ReadAll(bodyReader)
 	if err != nil {
 		return "", err
 	}

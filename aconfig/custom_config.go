@@ -21,6 +21,7 @@ const (
 type Common struct {
 	Log          Log          `json:"log,omitempty"`
 	Database     Database     `json:"database,omitempty"`
+	Encryptor    Encryptor    `json:"encryptor,omitempty"`
 	Var          Var          `json:"var,omitempty"`
 	SaramaConfig SaramaConfig `json:"sarama_config,omitempty"`
 }
@@ -100,4 +101,8 @@ func (db *Database) complete() {
 	if db.SlowThresholdMilliseconds == 0 {
 		db.SlowThresholdMilliseconds = defaultSlowThresholdMilliseconds
 	}
+}
+
+type Encryptor struct {
+	S string `json:"s,omitempty"`
 }

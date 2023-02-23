@@ -37,7 +37,7 @@ func NewRestyWith(portName aconfig.PortName, appConfig *aconfig.Application, pro
 	address := strings.TrimPrefix(location.Address, "http://")
 	address = strings.TrimPrefix(address, "https://")
 	hostURL := fmt.Sprintf("%s%s:%d", protocol, address, location.Port)
-	client.SetHostURL(hostURL)
+	client.SetBaseURL(hostURL)
 
 	return client, nil
 }

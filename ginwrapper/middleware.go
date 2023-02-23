@@ -2,7 +2,7 @@ package ginwrapper
 
 import (
 	"bytes"
-	"io/ioutil"
+	"io"
 	"net"
 	"net/http/httputil"
 	"os"
@@ -71,8 +71,8 @@ func Ginzap(logger *zap.Logger, timeFormat string, utc bool) gin.HandlerFunc {
 
 		var reqBody string
 		if ahttp.IsTextContentType(c.ContentType()) && c.Request.Body != nil {
-			bodyBytes, _ := ioutil.ReadAll(c.Request.Body)
-			c.Request.Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))
+			bodyBytes, _ := io.ReadAll(c.Request.Body)
+			c.Request.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
 
 			reqBody = autil.Substr(string(bodyBytes), 0, logMaxBodySize)
 		}
